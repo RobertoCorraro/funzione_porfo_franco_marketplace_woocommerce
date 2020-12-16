@@ -1,37 +1,48 @@
 <?php // Se copi e incolli questo codice in un file "function.php", fai attenzione a sta riga qua.
 
 
+// Tutte le variabili utili:
+//
+// 1- Nome della categoria
+// 2- Valore Porto Franco per ciascuna categoria ( = prezzo entro cui scatta la spedizione gratuita )
+// 3- Costo della Spedizione ITALIA
+// 4- Costo della Spedizione ESTERO
+// 5- Sconto applicato o meno? (booleano)
+// 6- Sconto totale di tutto il carrello
+//
+
 // Dichiaro la funzione che conta Il TOTALE del costo per ogni CATEGORIA
 
 function contaProdPerCat( $cat_name ) {
 		
-	$cat_count = 0; 
+	$NperCat = 0; 
+
 	foreach(WC()->cart->get_cart() as $cart_item)  
 		if( has_term( $cat_name, 'product_cat', $cart_item['product_id']))		
-			$cat_count += $cart_item['line_total'];
-	return  $cat_count;
+			$NperCat += $cart_item['line_total'];
+	return  $NperCat;
 }
 
 // funzione di WP che aggancia la nostra funzione custom a WP.
 add_action( 'woocommerce_cart_calculate_fees', 'sconti_portfo_franco', 10, 1 );
 
 
-// Funzione che non funziona XD
-function ImpostaSconti($catTot, $ValPortoFranco, $CostoSped) {
-	
-	if ( $catTot > $ValPortoFranco) {	
-		echo $CostoSped;	
-	} 
-}
-
 // Tutto quello che c'è in questa funzione, viene "sparato" in quel hook.
 function sconti_portfo_franco($cart_object) {
 
+	
 	global $woocommerce;
 	
     	if ( is_admin() && ! defined( 'DOING_AJAX' ) )
         return;
 	
+	// Funzione che non funziona XD 
+	//function ImpostaSconti($catTot, $ValPortoFranco, $CostoSped) {
+
+	//	if ( $catTot > $ValPortoFranco) {	
+	//		echo $CostoSped;	
+	//	} 
+	//}
 	// Variabili CONTATORE
 
     	$conta_prodotti_ceci =
