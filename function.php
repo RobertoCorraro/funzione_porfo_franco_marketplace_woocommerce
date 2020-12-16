@@ -3,7 +3,7 @@
 
 // Tutte le variabili utili:
 //
-// 1- Nome della categoria
+// 1- Nome / ID della categoria
 // 2- Valore Porto Franco per ciascuna categoria ( = prezzo entro cui scatta la spedizione gratuita )
 // 3- Costo della Spedizione ITALIA
 // 4- Costo della Spedizione ESTERO
@@ -36,13 +36,21 @@ function sconti_portfo_franco($cart_object) {
     	if ( is_admin() && ! defined( 'DOING_AJAX' ) )
         return;
 	
-	// Funzione che non funziona XD 
-	//function ImpostaSconti($catTot, $ValPortoFranco, $CostoSped) {
+	//////////////////
+	// Variabili "FISSE" (potrebbero forse essere delle costanti)
+	//////////////////
 
-	//	if ( $catTot > $ValPortoFranco) {	
-	//		echo $CostoSped;	
-	//	} 
-	//}
+	$discount = $sconto_complessivo = 0;
+
+	$ZonaSpedizione = wc_get_shipping_zone( $package );
+    	$ID_Zona = $ZonaSpedizione->get_id();
+		
+	//* Add countries to array('US'); to include more countries to surcharge
+	// * http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes for available alpha-2 country codes 
+	
+	$italia = array('IT');
+	$Usa_e_Canada = array('CA, US');
+
 	// Variabili CONTATORE
 
     	$conta_prodotti_ceci =
@@ -61,20 +69,6 @@ function sconti_portfo_franco($cart_object) {
 	$sconto_muraglia = 
 	$sconto_dambra = 0;
 	
-	// Variabili GENERALI
-	
-	$discount = 0;
-	$sconto_complessivo = 0;
-
-	$ZonaSpedizione = wc_get_shipping_zone( $package );
-    	$ID_Zona = $ZonaSpedizione->get_id();
-		
-	//* Add countries to array('US'); to include more countries to surcharge
-	// * http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes for available alpha-2 country codes 
-	
-	$italia = array('IT');
-	$Usa_e_Canada = array('CA, US');
-
 	/***
 	Effettua conteggio dei prodotti per ciascuna categoria
 	****/
