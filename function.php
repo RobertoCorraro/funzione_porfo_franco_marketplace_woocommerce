@@ -15,6 +15,15 @@ function contaProdPerCat( $cat_name ) {
 // funzione di WP che aggancia la nostra funzione custom a WP.
 add_action( 'woocommerce_cart_calculate_fees', 'sconti_portfo_franco', 10, 1 );
 
+
+// Funzione che non funziona XD
+function ImpostaSconti($catTot, $ValPortoFranco, $CostoSped) {
+	
+	if ( $catTot > $ValPortoFranco) {	
+		echo $CostoSped;	
+	} 
+}
+
 // Tutto quello che c'è in questa funzione, viene "sparato" in quel hook.
 function sconti_portfo_franco($cart_object) {
 
