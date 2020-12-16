@@ -1,20 +1,31 @@
 <?php // Se copi e incolli questo codice in un file "function.php", fai attenzione a sta riga qua.
 
+
+// Dichiaro la funzione che conta Il TOTALE del costo per ogni CATEGORIA
+
+function contaProdPerCat( $cat_name ) {
+		
+	$cat_count = 0; 
+	foreach(WC()->cart->get_cart() as $cart_item)  
+		if( has_term( $cat_name, 'product_cat', $cart_item['product_id']))		
+			$cat_count += $cart_item['line_total'];
+	return  $cat_count;
+}
+
 // funzione di WP che aggancia la nostra funzione custom a WP.
 add_action( 'woocommerce_cart_calculate_fees', 'sconti_portfo_franco', 10, 1 );
 
+// Tutto quello che c'è in questa funzione, viene "sparato" in quel hook.
 function sconti_portfo_franco($cart_object) {
 
 	global $woocommerce;
 	
-
-    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+    	if ( is_admin() && ! defined( 'DOING_AJAX' ) )
         return;
-
-
+	
 	// Variabili CONTATORE
 
-    $conta_prodotti_ceci =
+    	$conta_prodotti_ceci =
 	$conta_prodotti_muraglia = 
 	$conta_prodotti_dambra = 0;
 	
@@ -34,16 +45,19 @@ function sconti_portfo_franco($cart_object) {
 	
 	$discount = 0;
 	$sconto_complessivo = 0;
-	//$ZonaSpedizione = wc_get_shipping_zone( $package );
+
 	$ZonaSpedizione = wc_get_shipping_zone( $package );
-    $ID_Zona   = $ZonaSpedizione->get_id();
+    	$ID_Zona = $ZonaSpedizione->get_id();
 		
-	
 	//* Add countries to array('US'); to include more countries to surcharge
 	// * http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes for available alpha-2 country codes 
 	
 	$italia = array('IT');
 	$Usa_e_Canada = array('CA, US');
+
+	/***
+	Effettua conteggio dei prodotti per ciascuna categoria
+	****/
 
 	$categoria_ceci_total = contaProdPerCat( 808 ) + contaProdPerCat( 930 ) ; // Calcola sia prodotti in ITA che in ENG
 	$categoria_muraglia_total = contaProdPerCat( 810 ) + contaProdPerCat( 852 ) + contaProdPerCat( 926 ) + contaProdPerCat( 928 ); //  Muraglia food che Muraglia Design (ita + eng)
@@ -51,9 +65,9 @@ function sconti_portfo_franco($cart_object) {
 
 	
 	$discount_text_output = "Sconti porto franco";
-    $discount_text = __( 'Sconto ', 'woocommerce' );
+    	$discount_text = __( 'Sconto ', 'woocommerce' );
 
-    ///////////////
+    	///////////////
 	//////// ## CALCULATIONS ##
 	///////////////
 	
@@ -63,36 +77,24 @@ function sconti_portfo_franco($cart_object) {
 
 	// 1 -------- Sconto CECI in base al paese di SPEDIZIONE e al COSTO TOTALE DELLA CATEGORIA
 
-
-	
-	if ( $categoria_ceci_total > 50) {
-		
+	if ( $categoria_ceci_total > 50) {		
 		$sconto_ceci = 16.50;
-	
 	} 
 	
 	// 2 -------- Sconto Muraglia in base al paese di SPEDIZIONE e al COSTO TOTALE DELLA CATEGORIA
 	
-	if ( $categoria_muraglia_total > 100 && $SpedizioneItalia) { 
-		
-		$sconto_muraglia = 7; 
-			
-	} elseif ( $categoria_muraglia_total > 200 && $SpedizioneEstero) { 
-		
-		$sconto_muraglia = 19; 
-			
+	if ( $categoria_muraglia_total > 100 && $SpedizioneItalia) { 	
+		$sconto_muraglia = 7; 		
+	} elseif ( $categoria_muraglia_total > 200 && $SpedizioneEstero) { 	
+		$sconto_muraglia = 19; 		
 	} 
 	
 	// 2 -------- Sconto DAMBRA in base al paese di SPEDIZIONE e al COSTO TOTALE DELLA CATEGORIA
 	
-	if ( $categoria_dambra_total > 35 && $SpedizioneItalia) { 
-		
-		$sconto_dambra = 9; 
-			
-	} elseif ( $categoria_dambra_total > 90 && $SpedizioneEstero) { 
-		
-		$sconto_dambra = 25; 
-			
+	if ( $categoria_dambra_total > 35 && $SpedizioneItalia) { 	
+		$sconto_dambra = 9; 		
+	} elseif ( $categoria_dambra_total > 90 && $SpedizioneEstero) { 	
+		$sconto_dambra = 25; 		
 	} 
 		
 	///////////////
@@ -102,9 +104,11 @@ function sconti_portfo_franco($cart_object) {
 	$sconto_complessivo = $sconto_ceci + $sconto_muraglia + $sconto_dambra; // Aggiungi variabile qui
 
 	// Questo resta come sta
+
 	$discount = $sconto_complessivo * -1;	
-    if ( $discount != 0 ) {$cart_object->add_fee( $discount_text_output, $discount, false );}
-    // Note: Last argument in add_fee() method is related to applying the tax or not to the discount (true or false)	
+
+	// Note: Last argument in add_fee() method is related to applying the tax or not to the discount (true or false)	
+	if ( $discount != 0 ) {$cart_object->add_fee( $discount_text_output, $discount, false );}
 }
 
 
