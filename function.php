@@ -30,7 +30,6 @@ add_action( 'woocommerce_cart_calculate_fees', 'sconti_portfo_franco', 10, 1 );
 // Tutto quello che c'è in questa funzione, viene "sparato" in quel hook.
 function sconti_portfo_franco($cart_object) {
 
-	
 	global $woocommerce;
 	
     	if ( is_admin() && ! defined( 'DOING_AJAX' ) )
@@ -50,6 +49,17 @@ function sconti_portfo_franco($cart_object) {
 	
 	$italia = array('IT');
 	$Usa_e_Canada = array('CA, US');
+
+	$discount_text_output = "Sconti porto franco";
+    	$discount_text = __( 'Sconto ', 'woocommerce' );
+	
+	$SpedizioneItalia = in_array( $woocommerce->customer->get_shipping_country(), $italia );
+	$SpedizioneEstero = !in_array( $woocommerce->customer->get_shipping_country(), $italia );
+
+	//////////////////
+	// Variabili "VARIABILI" 
+	// ps: vorrei accorpare ciò che si "ripete" (da riga 64 a 114) in una funzione, per poi "aggiornare" il risultato facilmente.
+	//////////////////
 
 	// Variabili CONTATORE
 
@@ -73,21 +83,13 @@ function sconti_portfo_franco($cart_object) {
 	Effettua conteggio dei prodotti per ciascuna categoria
 	****/
 
-	$categoria_ceci_total = contaProdPerCat( 808 ) + contaProdPerCat( 930 ) ; // Calcola sia prodotti in ITA che in ENG
-	$categoria_muraglia_total = contaProdPerCat( 810 ) + contaProdPerCat( 852 ) + contaProdPerCat( 926 ) + contaProdPerCat( 928 ); //  Muraglia food che Muraglia Design (ita + eng)
-	$categoria_dambra_total = contaProdPerCat( 1235 ); //+ cat_cart_count( 856 ); // Calcola sia prodotti in ITA che in ENG
-
-	
-	$discount_text_output = "Sconti porto franco";
-    	$discount_text = __( 'Sconto ', 'woocommerce' );
+	$categoria_ceci_total = contaProdPerCat( 808 ) 
+	$categoria_muraglia_total = contaProdPerCat( 810 ) + contaProdPerCat( 852 ); //  Muraglia food che Muraglia Design (ita + eng)
+	$categoria_dambra_total = contaProdPerCat( 1235 ); // Calcola sia prodotti in ITA che in ENG
 
     	///////////////
 	//////// ## CALCULATIONS ##
 	///////////////
-	
-	$SpedizioneItalia = in_array( $woocommerce->customer->get_shipping_country(), $italia );
-	$SpedizioneEstero = !in_array( $woocommerce->customer->get_shipping_country(), $italia );
-
 
 	// 1 -------- Sconto CECI in base al paese di SPEDIZIONE e al COSTO TOTALE DELLA CATEGORIA
 
@@ -117,8 +119,11 @@ function sconti_portfo_franco($cart_object) {
 	
 	$sconto_complessivo = $sconto_ceci + $sconto_muraglia + $sconto_dambra; // Aggiungi variabile qui
 
+	///////////////
+	// APPLICAZIONE DELLO SCONTO
+	//////////////////
+	
 	// Questo resta come sta
-
 	$discount = $sconto_complessivo * -1;	
 
 	// Note: Last argument in add_fee() method is related to applying the tax or not to the discount (true or false)	
